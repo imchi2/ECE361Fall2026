@@ -14,45 +14,48 @@
 #                     shows real variables and exact line numbers
 #     -MMD -MP        write a .d file per object, listing the headers it
 #                     used, so editing a header rebuilds that object
+#     -I.             add hw01/ itself to the header search path, so
+#                     tests/test_bits.c can still #include "bits.h"
 
 CC      := gcc
-CFLAGS  := -std=c11 -Wall -Wextra -g3 -O0 -MMD -MP
+CFLAGS  := -std=c11 -Wall -Wextra -g3 -O0 -I. -MMD -MP
 
-# The source files of the library: bits.c from Part 2, status.c from
-# Part 3. Kept as an explicit list rather than a wildcard, for readability.
-SRCS    := bits.c status.c
+# Every .c file of this homework, as an explicit list rather than a
+# wildcard, for readability: the library from Parts 2 and 3, and the test
+# program from Part 4. `make` compiles each one to its own .o file.
+SRCS    := bits.c status.c tests/test_bits.c
 OBJS    := $(SRCS:.c=.o)
 DEPS    := $(OBJS:.o=.d)
 
-# The test program lives in its own folder.
-TEST_BIN   := tests/test_bits
-TEST_OBJ   := tests/test_bits.o
-TEST_DEP   := tests/test_bits.d
+# The linked test program that `make test` runs.
+TEST_BIN := tests/test_bits
 
 .PHONY: all test clean
 
 # Default target: compile every source file to its own object file.
 all: $(OBJS)
 
-# Pattern rule: bits.c becomes bits.o, status.c becomes status.o, and so on.
+# Pattern rule: bits.c becomes bits.o, and tests/test_bits.c becomes
+# tests/test_bits.o, and so on.
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Link the test program against the library objects.
-$(TEST_BIN): $(TEST_OBJ) $(OBJS)
+# Link the test program from every object file. `$^` expands to the list
+# of prerequisites above, so this reads: gcc <flags> bits.o status.o
+# tests/test_bits.o -o tests/test_bits
+$(TEST_BIN): $(OBJS)
 	$(CC) $(CFLAGS) $^ -o $@
 
-# Build the tests and run them. The program exits nonzero if any test fails,
-# which makes `make test` fail too.
+# Build the tests and run them. The program exits nonzero if any test
+# fails, which makes `make test` fail too.
 test: $(TEST_BIN)
 	./$(TEST_BIN)
 
 # Remove everything the build produced. "rm -f" ignores files that are not
 # there, so this works on a fresh checkout as well as after a build.
 clean:
-	rm -f $(OBJS) $(DEPS) $(TEST_OBJ) $(TEST_DEP) $(TEST_BIN)
+	rm -f $(OBJS) $(DEPS) $(TEST_BIN)
 
 # Read back the header dependencies written by -MMD. They are included last
 # so the rules above are already known when they load.
 -include $(DEPS)
--include $(TEST_DEP)

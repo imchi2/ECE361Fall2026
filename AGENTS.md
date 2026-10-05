@@ -86,11 +86,18 @@ These are explicit user requirements, not defaults:
 - `make` must produce **zero warnings** (`-std=c11 -Wall -Wextra -g3 -O0 -MMD
   -MP`); `make clean` must work. Header edits rebuild the right object via the
   `-MMD` `.d` files included at the bottom of the Makefile.
-- `SRCS` is an explicit list (`SRCS := bits.c`) — deliberately not a wildcard,
-  for readability. **Add `status.c` to it by hand in Part 3.**
-- `make test` is wired up but currently stops with
-  `No rule to make target 'tests/test_bits.o'`, because `tests/test_bits.c`
-  does not exist yet (Part 4).
+- `SRCS` is an explicit list (`bits.c status.c tests/test_bits.c`) —
+  deliberately not a wildcard, for readability. Plain `make` compiles every
+  `.c` to its own `.o`, which is what Part 4 asks for.
+- `CFLAGS` carries `-I.` so `tests/test_bits.c` can `#include "bits.h"`:
+  quoted includes search the *includer's* folder first (`tests/`), then the
+  `-I` paths.
+- `make test` links `tests/test_bits` from the objects and runs it. The
+  program prints PASS/FAIL per check plus a summary, returns 1 if anything
+  failed (which fails `make test`), and checks `print_binary` by eye: the
+  expected text comes first, the real output follows the arrow. **User
+  decision: no file I/O, no `unistd.h`, no `strcmp` in the tests — keep it
+  that simple.**
 - To try code without polluting the deliverable, build in a temp dir under WSL:
   `gcc -std=c11 -Wall -Wextra -I /mnt/c/ECE361_C/hw01 <temp>/smoke.c /mnt/c/ECE361_C/hw01/bits.c`
 
@@ -119,19 +126,24 @@ These are explicit user requirements, not defaults:
 
 ## Status (as of 2026-10-04)
 
-- hw01 due **Sun Oct 4, 11:59pm** (today). `main` has 3 commits: "Implement
-  part 2" plus two README commits. The top-level `README.md` now carries the
-  student name (Xinyi Xu), which had been due **Fri Oct 2**.
-- Done and committed: Part 2 (`bits.h`, `bits.c`, `Makefile`) — helpers
-  inlined, Makefile plain POSIX; verified under WSL: warning-free build,
-  `make clean` works, header edits rebuild via `-MMD`, 44-case throwaway
-  suite passed (since deleted).
-- Done, **not committed yet**: Part 3 (`status.h`, `status.c`, and `status.c`
-  added to `SRCS`). Verified under WSL only: `make` is warning-free,
-  `make clean` -> `make` -> `make clean` works, and an 8-case throwaway smoke
-  test passed (spec example `status_unpack(0x1631)`, invalid modes 5/6/7,
-  set point bounds -128/127/22, zero word, all-ones word; since deleted).
-- Also fixed: `.gitignore` was UTF-16, so git matched none of its patterns.
-  Rewritten as UTF-8; `*.d` and `tests/test_bits` added.
-- Outstanding: Part 4 `tests/test_bits.c`, `hw01/README.md`,
-  `hw01/AI_USAGE.md`, commit Part 3, push before **Sun Oct 4, 11:59pm**.
+- hw01 due **Sun Oct 4, 11:59pm** (today). `main` has 5 commits: "Implement
+  part 2", two README commits, "Add student name to README", "Implement
+  part 3". The top-level `README.md` carries the student name (Xinyi Xu),
+  which had been due **Fri Oct 2**.
+- Done and committed: Part 2 (`bits.h`, `bits.c`), Part 3 (`status.h`,
+  `status.c`), the Makefile, the `.gitignore` UTF-16 -> UTF-8 fix,
+  `AGENTS.md` updates.
+- Done, **not committed yet**: Part 4 — `tests/test_bits.c` plus the
+  Makefile rewrite (`SRCS` lists all three `.c` files, `-I.` added). Verified
+  under WSL: `make` warning-free, `make test` exits 0 with **44/44 PASS**
+  (10 `get_field`, 9 `set_field`, 9 `sign_extend`, 16 `status_unpack` over
+  4 words incl. `0x1631`, plus 7 `print_binary` eyeball checks), and
+  `make clean` leaves only `test_bits.c` behind.
+- Also done, **not committed yet**: `hw01/README.md` (what the library
+  does, build/test commands, valid ranges, boundary behavior, the Part 2
+  out-of-range policy, and how `status_unpack` reports an invalid mode) and
+  `hw01/AI_USAGE.md` (tools used, the gitignore pattern error and how it
+  was caught with `git check-ignore`, and the over-engineered first test
+  draft that the user had to correct).
+- Outstanding: commit Part 4 + the two `.md` files, push before
+  **Sun Oct 4, 11:59pm**.
