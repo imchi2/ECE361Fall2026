@@ -3,6 +3,8 @@ ECE-361 Fall 2026, Computer System Organization
 Professor: Dr. Christof Teuscher. 
 Assignments and projects for the course.
 
+Student: Xinyi Xu
+
 Course description:
 ECE 361 teaches intermediate C programming, data structures, and the tools a working engineer uses every
 day. You will write reusable, maintainable C in the form of abstract data types and multi-file modules, and you
