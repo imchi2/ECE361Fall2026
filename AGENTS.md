@@ -11,8 +11,12 @@ paths and file names** — never rename, move, or add top-level folders.
 - **Commit is fine, never `git push`** — the user pushes.
 - Specs are the PDFs inside each hw dir (e.g. `hw01/ece361_hw01_fall_2026_r1.pdf`).
   Read them first; grading criteria are listed at the end of each spec.
-- `.gitignore` excludes `*.pdf`, `*.o`, `*.exe` — spec PDFs and build output are
-  intentionally never committed. Don't fight it.
+- `.gitignore` excludes `*.pdf`, `*.o`, `*.d`, `*.exe`, and the test binary
+  (pattern `test_bits`, no slash so it matches `hwNN/tests/test_bits`) —
+  spec PDFs and build output are intentionally never
+  committed. Don't fight it. It used to be UTF-16 (git parsed no pattern at
+  all, so the spec PDF showed as untracked); it is plain UTF-8 now — keep it
+  that way.
 - Every homework also needs `README.md` and `AI_USAGE.md` **inside its own
   folder**, plus a top-level `README.md` with the student's name. `AI_USAGE.md`
   must name the tools used and one thing a model got wrong.
@@ -105,15 +109,29 @@ These are explicit user requirements, not defaults:
   numbers"), and `(status & 0x08) == 0` — remember `==` binds tighter than `&`.
 - `bits.c` is reused by the term project ("Keep bits.c clean") — favour clear,
   commented, tested code over cleverness.
+- Part 3 invalid-mode policy (spec: "decide how your `status_t` reports it"):
+  `status_t` keeps the raw `int mode` (0..7, even when invalid) **and** an
+  extra `bool mode_valid` that is false for modes 5..7. Documented in
+  `status.h`; the README must say so too.
+- Part 3 named constants (`STATUS_POS_*`, `STATUS_WIDTH_*`, `STATUS_MODE_*`)
+  live in `status.h`, not `status.c`, so the word layout reads as interface
+  and tests/callers can use the `STATUS_MODE_*` values.
 
 ## Status (as of 2026-10-04)
 
-- hw01 due **Sun Oct 4, 11:59pm**. Nothing committed yet (`main` has zero
-  commits; `.gitignore`, `AGENTS.md`, and `hw01/` are untracked).
-- Done: Part 2 (`bits.h`, `bits.c`, `Makefile`) — helpers inlined and the
-  Makefile reduced to plain POSIX; verified under WSL: warning-free build,
-  `make clean` works, header edits trigger rebuilds, and a 44-case throwaway
+- hw01 due **Sun Oct 4, 11:59pm** (today). `main` has 3 commits: "Implement
+  part 2" plus two README commits. The top-level `README.md` now carries the
+  student name (Xinyi Xu), which had been due **Fri Oct 2**.
+- Done and committed: Part 2 (`bits.h`, `bits.c`, `Makefile`) — helpers
+  inlined, Makefile plain POSIX; verified under WSL: warning-free build,
+  `make clean` works, header edits rebuild via `-MMD`, 44-case throwaway
   suite passed (since deleted).
-- Outstanding: Part 3 `status.h`/`status.c` (and add `status.c` to `SRCS`),
-  Part 4 `tests/test_bits.c`, `hw01/README.md`, `hw01/AI_USAGE.md`, top-level
-  `README.md` (name), first commit.
+- Done, **not committed yet**: Part 3 (`status.h`, `status.c`, and `status.c`
+  added to `SRCS`). Verified under WSL only: `make` is warning-free,
+  `make clean` -> `make` -> `make clean` works, and an 8-case throwaway smoke
+  test passed (spec example `status_unpack(0x1631)`, invalid modes 5/6/7,
+  set point bounds -128/127/22, zero word, all-ones word; since deleted).
+- Also fixed: `.gitignore` was UTF-16, so git matched none of its patterns.
+  Rewritten as UTF-8; `*.d` and `tests/test_bits` added.
+- Outstanding: Part 4 `tests/test_bits.c`, `hw01/README.md`,
+  `hw01/AI_USAGE.md`, commit Part 3, push before **Sun Oct 4, 11:59pm**.

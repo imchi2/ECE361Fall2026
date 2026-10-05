@@ -18,8 +18,9 @@
 CC      := gcc
 CFLAGS  := -std=c11 -Wall -Wextra -g3 -O0 -MMD -MP
 
-# The source files of the library. Add status.c here in Part 3.
-SRCS    := bits.c
+# The source files of the library: bits.c from Part 2, status.c from
+# Part 3. Kept as an explicit list rather than a wildcard, for readability.
+SRCS    := bits.c status.c
 OBJS    := $(SRCS:.c=.o)
 DEPS    := $(OBJS:.o=.d)
 
