@@ -1,17 +1,30 @@
-# Line endings, enforced so the build works no matter who clones this.
+# Line endings, so that a clone on any machine produces the same bytes.
 #
 # This machine (and most Windows ones) has core.autocrlf=true, which
-# rewrites checked-out text files with CRLF endings. That is harmless for
-# .c and .h (gcc does not care), but not for the two file types below:
+# rewrites checked-out text files to CRLF. That silently breaks two
+# different parts of this homework, in ways gcc will not warn about:
 #
-#   *.sh      sh reads regress.sh line by line; a trailing \r makes dash
-#             report "Syntax error: word unexpected (expecting do)" on
-#             the very first `for`, so `make test` fails for reasons
-#             that have nothing to do with the homework.
-#   Makefile  recipe lines would carry a \r into the shell.
+#   1. *.sh and Makefile
+#      sh reads regress.sh line by line, so a trailing \r makes dash
+#      report "Syntax error: word unexpected (expecting do)" on the
+#      first `for` loop, and `make test` fails before running anything.
 #
-# `eol=lf` overrides autocrlf on checkout: these files are always LF on
-# disk, on every platform. Verified by cloning the repo with
-# autocrlf=true and running `make test`.
-Makefile text eol=lf
-*.sh     text eol=lf
+#   2. data/*.txt and expected/*.txt
+#      regress.sh does `diff - expected/<name>`. The program writes
+#      LF on stdout, so a CRLF copy of the golden file never matches.
+#      Worse, the *input* files matter too: a blank line read as
+#      "\r\n" is no longer recognised as blank, it fails to parse as
+#      three numbers, and the printed `skipped:` count changes.
+#      So the outputs would differ even with the diff removed.
+#
+# `eol=lf` overrides autocrlf on checkout: text is always LF on disk,
+# on every platform. This applies to every text file so that a future
+# homework's data files are covered without editing this file.
+#
+# `.zip` is explicitly not text so that the starter archive is stored
+# and checked out byte for byte. Verified by cloning this repository
+# with autocrlf=true: Makefile, *.sh, data/*.txt and expected/*.txt
+# contain no CR bytes, the .zip is bit-identical, and `make test`
+# reports 4/4 PASS.
+*           text=auto eol=lf
+*.zip       -text
