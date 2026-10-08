@@ -1,0 +1,10 @@
+readings: 9
+skipped:  2
+temperature: min   -3.5  max  104.2  mean  45.97 C
+humidity:    min   40.0  max   50.0  mean  45.61 %RH
+above 25.0 C: longest run 6 readings, from tick 180 to tick 540
+histogram:
+    0.0 to   5.0 C | ** 2
+   20.0 to  25.0 C | * 1
+   30.0 to  35.0 C | *** 3
+   95.0 to 100.0 C | *** 3
