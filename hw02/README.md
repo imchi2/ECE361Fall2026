@@ -22,6 +22,7 @@ module diagram and the rules that keep it from turning into a hairball.
 | `histogram.h` / `histogram.c` | the 5 C temperature bins, and printing them |
 | `regress.sh` | the regression test: diffs every output against `expected/` |
 | `Makefile` | builds each `.c` to its own `.o`, links `./readings`, runs the test |
+| `../.gitattributes` | forces LF line endings on checkout — see below |
 | `data/` | the input files |
 | `expected/` | the golden outputs — the definition of "unchanged" |
 | `hw02_starter.zip` | the original download, kept unmodified |
@@ -72,6 +73,30 @@ Or from a WSL shell already inside `hw02/`, just `make`, `make test`,
 Editing a header rebuilds exactly the objects that include it, via the
 `.d` files that `-MMD -MP` writes; the `-include` at the bottom of the
 Makefile reads them back.
+
+## Why the repository forces LF line endings
+
+The repo has `core.autocrlf=true`, so a clone on a Windows machine
+would otherwise check every text file out with CRLF endings — and
+`make test` would fail for two reasons that gcc never warns about:
+
+- **`regress.sh` would not run at all.** `sh` reads it line by line,
+  and a trailing `\r` makes dash report
+  `Syntax error: word unexpected (expecting "do")` on the first `for`.
+- **The regression would fail even if it ran.** `regress.sh` does
+  `diff - expected/<name>` while the program writes LF to stdout, so a
+  CRLF copy of the golden file never matches. And the *input* files
+  change the output too: a blank line read as `"\r\n"` no longer
+  matches the `'\n'` test, falls through to `sscanf`, fails to parse as
+  three numbers, and bumps the printed `skipped:` count.
+
+`.gitattributes` therefore sets `* text=auto eol=lf` (and `*.zip
+-text`), which overrides `autocrlf` on checkout. This was checked by
+cloning the repository with `core.autocrlf=true` and confirming that
+`Makefile`, `regress.sh`, `readings.c`, every file in `data/` and
+`expected/` contains no CR byte, that `hw02_starter.zip` hashes
+identically to the original, and that `make test` still reports 4/4
+PASS in that fresh clone.
 
 ## Design decisions
 

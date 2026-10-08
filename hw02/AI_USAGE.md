@@ -69,6 +69,44 @@ before comparing stderr, and re-running reports 47 cases with 0
 failing. A test that fails has to be proven wrong before the code is
 blamed for it.
 
+## One claim that was written before it was true
+
+**The first version of `.gitattributes` said it had been verified, and it
+had not been.** Reading `regress.sh` and the `Makefile`, the model
+concluded that the CRLF risk was about shell scripts and recipe lines,
+wrote `.gitattributes` covering only `Makefile` and `*.sh`, and put the
+sentence *"Verified by cloning the repo with autocrlf=true and running
+`make test`"* in the comment — before any clone existed.
+
+**How it was found:** by actually running the test it claimed to have
+run. A clone made with `core.autocrlf=true` built fine and then failed
+**4 out of 4** regressions:
+
+```
+FAIL  regression edge.txt
+```
+
+The cause was not the script this time. `autocrlf=true` had also turned
+`data/*.txt` and `expected/*.txt` into CRLF files:
+
+1. `regress.sh` does `diff - expected/<name>`, and the program writes
+   LF to stdout, so a CRLF golden file can never match.
+2. Worse, the *inputs* changed behaviour: a blank line read as `"\r\n"`
+   no longer matches the `'\n'` check, so it falls through to `sscanf`,
+   fails to parse as three numbers, and increments `skipped:`. The
+   output was wrong independently of the diff.
+
+The fix was to stop enumerating file types and enforce LF on every text
+file (`* text=auto eol=lf`), with `*.zip -text` so the starter archive
+stays byte for byte the same. The claim in the comment is now true
+because it was tested afterwards: the re-clone shows 0 CR bytes in
+`Makefile`, `regress.sh`, `readings.c`, all of `data/` and all of
+`expected/`, the `.zip` hashes match the original, and `make test`
+reports 4/4 PASS.
+
+The lesson: a comment that says "verified" is a test result, and it goes
+stale the moment it is written before the test runs.
+
 ## One more thing worth recording
 
 The first attempt to drive WSL from PowerShell put shell variables
