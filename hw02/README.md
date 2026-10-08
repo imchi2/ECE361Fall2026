@@ -20,6 +20,8 @@ module diagram and the rules that keep it from turning into a hairball.
 | `stats.h` / `stats.c` | min, max and mean of a float array |
 | `run.h` / `run.c` | longest run of readings above the threshold |
 | `histogram.h` / `histogram.c` | the 5 C temperature bins, and printing them |
+| `DIAGRAM.md` | the module diagram: what each module owns, and the rules that keep the dependencies one-directional |
+| `ARRAYS.md` | background reading on the original `readings.c`: the parallel arrays, `count`, and the bounds rules (line numbers refer to the starter) |
 | `regress.sh` | the regression test: diffs every output against `expected/` |
 | `Makefile` | builds each `.c` to its own `.o`, links `./readings`, runs the test |
 | `../.gitattributes` | forces LF line endings on checkout — see below |

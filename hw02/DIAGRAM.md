@@ -90,6 +90,10 @@ changing what the program prints.
 wsl -d Ubuntu -- sh -c "cd /mnt/c/ECE361_C/hw02 && make test"
 ```
 
+See also: [`ARRAYS.md`](ARRAYS.md) explains the arrays this diagram
+replaced — the parallel `ticks` / `temps` / `hums` arrays, what `count`
+really means, and the bounds rules the modules still follow.
+
 `regress.sh` runs the program on every file in `data/` and `diff`s the
 output against the same name in `expected/`, plus `edge.txt` with a
 threshold of 25. All four must PASS — that is the definition of
