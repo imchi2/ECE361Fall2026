@@ -1,0 +1,17 @@
+# Line endings, enforced so the build works no matter who clones this.
+#
+# This machine (and most Windows ones) has core.autocrlf=true, which
+# rewrites checked-out text files with CRLF endings. That is harmless for
+# .c and .h (gcc does not care), but not for the two file types below:
+#
+#   *.sh      sh reads regress.sh line by line; a trailing \r makes dash
+#             report "Syntax error: word unexpected (expecting do)" on
+#             the very first `for`, so `make test` fails for reasons
+#             that have nothing to do with the homework.
+#   Makefile  recipe lines would carry a \r into the shell.
+#
+# `eol=lf` overrides autocrlf on checkout: these files are always LF on
+# disk, on every platform. Verified by cloning the repo with
+# autocrlf=true and running `make test`.
+Makefile text eol=lf
+*.sh     text eol=lf
