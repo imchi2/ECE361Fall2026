@@ -3,4 +3,5 @@
 *.d
 *.pdf
 test_bits
+test_ptr
 readings
