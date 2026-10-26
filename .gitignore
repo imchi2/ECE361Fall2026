@@ -4,4 +4,6 @@
 *.pdf
 test_bits
 test_ptr
+test_tally
+events
 readings

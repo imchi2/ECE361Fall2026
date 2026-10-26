@@ -1,0 +1,35 @@
+# door.txt - who came through the door on 2026-10-25.
+# One name per line. Blank lines and lines starting with # are
+# skipped and not counted; every other line goes into the tally.
+#
+# Names may repeat - that is the whole point of counting them.
+
+alice
+bob
+
+alice
+carol
+alice
+dave
+
+# a name longer than TALLY_LEN (15) characters: tally_add refuses it
+bartholomew_ok_but_the_long_name_is_not
+
+erin
+frank
+grace
+heidi
+ivan
+judy
+mallory
+niaj
+olivia
+peggy
+quentin
+# these last few make the tally full: only TALLY_NAMES (16)
+# different names fit, so the rest are refused and counted as skipped
+rupert
+sybil
+trent
+ursula
+victor
