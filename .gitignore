@@ -7,3 +7,6 @@ test_ptr
 test_tally
 events
 readings
+lock
+test_lock
+test_check
