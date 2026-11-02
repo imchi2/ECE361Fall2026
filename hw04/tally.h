@@ -40,7 +40,7 @@ typedef struct tally tally_t; /* opaque: only tally.c completes it */
  * Assumes: the caller will hand it back with tally_destroy; a tally
  *          that is never destroyed stays in use until the program
  *          ends.
- */
+
 tally_t *tally_create(void);
 
 /*

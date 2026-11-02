@@ -1,0 +1,15 @@
+# edge cases: comments, blank lines, bad lines, and values outside 0..100 C
+
+0      -3.5   40.0
+60     22.0   41.0
+   # an indented comment
+120    abc    42.0
+180    31.0   44.0
+	
+240    31.5
+300    104.2  45.0
+360    30.0   46.0
+420    30.1   47.5
+480    99.9   48.0
+540    100.0  49.0
+600    0.0    50.0

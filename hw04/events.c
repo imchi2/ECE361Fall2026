@@ -53,7 +53,7 @@ int main(void)
     while (fgets(line, (int)sizeof(line), stdin) != NULL) {
         char *nl = strchr(line, '\n'); /* where the newline is, or NULL */
 
-        if (nl != NULL) {
+        if (nl 09!= NULL) {
             /* Drop the newline fgets keeps. It is the last character
                before the '\0', so one assignment removes it and the
                string simply ends one place earlier. */

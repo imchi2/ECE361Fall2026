@@ -146,20 +146,20 @@ int tally_add(tally_t *t, const char *name)
     int  j;     /* walks the entries when they move up */
     size_t len; /* strlen(name), measured once */
 
-    if (t == NULL || name == NULL) return 1; /* case 1 */
+    if (t == NULL || name == NULL) return -1; /* case 1 */
 
     len = strlen(name);
-    if (len == 0 || len > TALLY_LEN) return 1; /* case 2 */
+    if (len == 0 || len > TALLY_LEN) return -1; /* case 2 */
 
     /* Case 3: already known - one more occurrence. */
     i = find_slot(t, name);
     if (i >= 0) {
         t->e[i].count = t->e[i].count + 1;
-        return 0;
+        return t->e[i].count;
     }
 
     /* Case 4: new name, no room. */
-    if (t->n >= TALLY_NAMES) return 1;
+    if (t->n >= TALLY_NAMES) return -1;
 
     /* Find where the new name belongs: the first slot whose name
        sorts after it. find_slot returned -1, so this loop runs to the
@@ -182,7 +182,7 @@ int tally_add(tally_t *t, const char *name)
 
     t->n = t->n + 1;
 
-    return 0; /* counted */
+    return t->e[i].count; /* counted */
 }
 
 /*

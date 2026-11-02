@@ -37,27 +37,57 @@
  */
 void swap_float(float *a, float *b) { float t = *a; *a = *b; *b = t; }
 
+static int counter(int *x){
+    return (*x = *x + 1);
+}
+
 /*
  * Everything is checked before a single element is written, because the
  * contract says "changes nothing" on failure - so the validation has to
  * come first. Only then does the single pass over the array start, from
  * the second element, since the first one is already in both outputs.
  */
-int minmax(const float *a, int n, float *min, float *max)
+int minmax(float a[], int n, float *min, float *max)
 {
-    const float *p; /* walks the elements, second up to (not incl.) last */
+    float *p; /* walks the elements, second up to (not incl.) last */
 
-    if (a == NULL || min == NULL || max == NULL || n < 1) return -1;
+    if ((a ==   NULL)
+     || (min == NULL)
+     || (max == NULL)
+     || (n   <  1   ))
+    {
+        return -1;
+    }
 
-    *min = *a; /* seed both answers with the first element, then improve */
-    *max = *a;
+    *min = a[0]; /* seed both answers with the first element, then improve */
+    *max = a[0];
 
     /* One loop, two comparisons: *p is compared against the best answer
        seen so far, and the record holders are overwritten in place. */
-    for (p = a + 1; p < a + n; p++) { if (*p < *min) *min = *p; if (*p > *max) *max = *p; }
+    for (p = a + 1; p < a + n; p++) { 
+        if (*p < *min) 
+        {
+            *min = *p; 
+        }
+        if (*p > *max) 
+        {
+            *max = *p; 
+        }
+    }
 
+    for (int i = 1; counter(&i) < n - 1;) { 
+        if (a[i] < *min) 
+        {
+            *min = a[i]; 
+        }
+        if (a[i] > *max) 
+        {
+            *max = a[i]; 
+        }
+    }
     return 0; /* 0 says: the two variables now hold real answers */
-}
+} /* minmax() */
+
 
 /*
  * A read-only scan. The pointer itself is the answer: as soon as *p

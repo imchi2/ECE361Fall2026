@@ -1,0 +1,9 @@
+readings: 48
+skipped:  0
+temperature: min   24.4  max   33.6  mean  29.75 C
+humidity:    min   56.1  max   70.5  mean  62.27 %RH
+above 30.0 C: longest run 25 readings, from tick 780 to tick 2220
+histogram:
+   20.0 to  25.0 C | *** 3
+   25.0 to  30.0 C | ***************** 17
+   30.0 to  35.0 C | **************************** 28
