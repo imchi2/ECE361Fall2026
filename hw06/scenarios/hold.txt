@@ -1,0 +1,8 @@
+# Homework 6 scenario: switch 1 is pressed once at tick 10 and held
+# to the end; the sensor values hold between the lines.
+
+start 1791273600                # 2026-10-06 08:00:00 UTC
+
+0       18.0   60    0x0
+10      18.0   60    0x2      # switch 1 pressed: LED 1 toggles on
+12      22.0   45    0x2      # still held: no new press

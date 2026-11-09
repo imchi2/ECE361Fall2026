@@ -10,3 +10,7 @@ readings
 lock
 test_lock
 test_check
+replay
+test_hw06
+tmp_scenario_*.txt
+regress_out.tmp

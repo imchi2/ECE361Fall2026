@@ -1,0 +1,10 @@
+# Homework 6 scenario: a press, a release, and a second press.
+# Each press of switch 0 toggles LED 0; a release changes nothing.
+
+start 1791273600                # 2026-10-06 08:00:00 UTC
+
+# tick  temp   rh    switches
+0       20.0   50    0x0
+2       21.5   40    0x1      # switch 0 pressed: LED 0 toggles on
+4       21.5   40    0x0      # released: LEDs stay as they were
+6       19.0   55    0x1      # pressed again: LED 0 toggles off
