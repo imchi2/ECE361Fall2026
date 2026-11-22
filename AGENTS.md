@@ -11,12 +11,16 @@ paths and file names** — never rename, move, or add top-level folders.
 - **Commit is fine, never `git push`** — the user pushes.
 - Specs are the PDFs inside each hw dir (e.g. `hw01/ece361_hw01_fall_2026_r1.pdf`).
   Read them first; grading criteria are listed at the end of each spec.
-- `.gitignore` excludes `*.pdf`, `*.o`, `*.d`, `*.exe`, and the test binary
-  (pattern `test_bits`, no slash so it matches `hwNN/tests/test_bits`) —
-  spec PDFs and build output are intentionally never
-  committed. Don't fight it. It used to be UTF-16 (git parsed no pattern at
-  all, so the spec PDF showed as untracked); it is plain UTF-8 now — keep it
-  that way.
+- `.gitignore` excludes `*.pdf`, `*.o`, `*.d`, `*.exe`, `*.tar.gz` (source
+  tarballs such as `iom361_r4.tar.gz` stay out; the extracted tree is
+  committed instead), scratch files (`tmp_scenario_*.txt`, `regress_out.tmp`),
+  and one bare name per homework binary (`test_bits`, `test_ptr`,
+  `test_tally`, `events`, `readings`, `lock`, `test_lock`, `test_check`,
+  `replay`, `test_hw06`, `balance`, `test_istack`) — no slashes, so each
+  matches in any `hwNN/` folder. Spec PDFs and build output are intentionally
+  never committed. Don't fight it. It used to be UTF-16 (git parsed no
+  pattern at all, so the spec PDF showed as untracked); it is plain UTF-8
+  now — keep it that way.
 - Every homework also needs `README.md` and `AI_USAGE.md` **inside its own
   folder**, plus a top-level `README.md` with the student's name. `AI_USAGE.md`
   must name the tools used and one thing a model got wrong.
@@ -65,21 +69,36 @@ These are explicit user requirements, not defaults:
   a comment in plain language; code and tests must be understandable by a
   classmate who just learned C.
 
-## Reading the spec PDFs (the obvious approaches fail)
+## Reading the spec PDFs
 
-- `read` rejects PDFs: *"this model does not support pdf input"*.
-- No PDF tools in either environment: `python3` has **no pip** (`No module named
-  pip` → no pypdf/pdfminer/fitz, verified on Ubuntu WSL too) and there is no
-  `pdftotext`.
-- Working recipe: pipe a Python script to `python -` (or `python3 -`) that
-  regex-splits `(\d+) 0 obj` bodies, `zlib.decompress`s `/FlateDecode` streams,
-  tokenizes the content stream for `(str)`, `<hex>`, `[`/`]`, `Tj`, `TJ`, and
-  maps bytes through each font's `/ToUnicode` CMap (`beginbfchar`,
-  `beginbfrange`). Only two fonts have a CMap; the rest decode as
-  latin1/utf-16be.
-- Trap that silently produces empty output: to find a `TJ` array, search
-  backwards for the `[` token specifically — searching for any bracket token
-  finds the closing `]`, and every text run comes out blank.
+- `read` still rejects PDFs: *"this model does not support pdf input"*. Never
+  pass a spec PDF to `read` — extract text first.
+- **`pypdf` is available in WSL and is the preferred tool** (verified 2026-11-21
+  on `hw01/ece361_hw01_fall_2026_r1.pdf`: 3 pages, 3122 chars on page 0, clean
+  text). There is **no `pdftotext`** binary, but that no longer matters:
+
+  ```
+  wsl -d Ubuntu -- python3 -c "from pypdf import PdfReader; \
+      print(PdfReader('/mnt/c/ECE361_C/hw01/ece361_hw01_fall_2026_r1.pdf').pages[0].extract_text())"
+  ```
+- Multi-line Python does not survive PowerShell — inline `python3 -c "..."` with
+  newlines gets parsed as PowerShell and fails with `ReservedKeywordNotAllowed`.
+  For anything past one line, **write a `.py` file** (temp dir:
+  `C:\Users\Xinyi Xu\AppData\Local\Temp\opencode`) and run it, e.g.
+  `wsl -d Ubuntu -- sh -c "python3 '/mnt/c/Users/Xinyi Xu/AppData/Local/Temp/opencode/probe.py' <pdf>"`.
+  Single-line `python3 -c '...'` with semicolons is fine.
+- Windows-side fallback: **`pymupdf` 1.28.2** is installed for Python 3.13 and
+  works, **but it mangles the curly apostrophe** — `Tuesday's` comes out as
+  `Tuesday\ufffd\ufffd\ufffds` where pypdf gives `Tuesday's` correctly. Prefer
+  pypdf; use pymupdf only when a file must be read from Windows without WSL.
+- **Old note, now obsolete — do not re-derive it.** This section used to claim
+  "no pip in either environment" and carry a hand-rolled recipe: regex-split
+  `(\d+) 0 obj`, `zlib.decompress` `/FlateDecode`, tokenize `(str)`/`<hex>`/
+  `Tj`/`TJ`, map bytes through each font's `/ToUnicode` CMap. pip works in both
+  environments now (WSL pip 25.1.1, Windows pip 26.1.2) and pypdf is installed.
+  The old recipe's `TJ`-bracket trap (search backwards for the `[` token, or
+  every run comes back blank) is only relevant if pypdf ever fails on a PDF —
+  reach for it then, not by default.
 
 ## Building and verifying (hw01)
 
@@ -124,26 +143,31 @@ These are explicit user requirements, not defaults:
   live in `status.h`, not `status.c`, so the word layout reads as interface
   and tests/callers can use the `STATUS_MODE_*` values.
 
-## Status (as of 2026-10-04)
+## Status (as of 2026-11-21)
 
-- hw01 due **Sun Oct 4, 11:59pm** (today). `main` has 5 commits: "Implement
-  part 2", two README commits, "Add student name to README", "Implement
-  part 3". The top-level `README.md` carries the student name (Xinyi Xu),
-  which had been due **Fri Oct 2**.
-- Done and committed: Part 2 (`bits.h`, `bits.c`), Part 3 (`status.h`,
-  `status.c`), the Makefile, the `.gitignore` UTF-16 -> UTF-8 fix,
-  `AGENTS.md` updates.
-- Done, **not committed yet**: Part 4 — `tests/test_bits.c` plus the
-  Makefile rewrite (`SRCS` lists all three `.c` files, `-I.` added). Verified
-  under WSL: `make` warning-free, `make test` exits 0 with **44/44 PASS**
-  (10 `get_field`, 9 `set_field`, 9 `sign_extend`, 16 `status_unpack` over
-  4 words incl. `0x1631`, plus 7 `print_binary` eyeball checks), and
-  `make clean` leaves only `test_bits.c` behind.
-- Also done, **not committed yet**: `hw01/README.md` (what the library
-  does, build/test commands, valid ranges, boundary behavior, the Part 2
-  out-of-range policy, and how `status_unpack` reports an invalid mode) and
-  `hw01/AI_USAGE.md` (tools used, the gitignore pattern error and how it
-  was caught with `git check-ignore`, and the over-engineered first test
-  draft that the user had to correct).
-- Outstanding: commit Part 4 + the two `.md` files, push before
-  **Sun Oct 4, 11:59pm**.
+- hw01–hw07 are all committed (21 commits, latest 2026-11-16). hw07 (istack
+  ADT + bracket checker) was due Sun Nov 15; its Shine closed Wed Nov 18.
+  Homework topics: hw01 bits library, hw02 module split, hw03 pointer
+  library, hw04 tally ADT + events, hw05 state machines, hw06
+  sensor/panel/scenario replay, hw07 istack.
+- Uncommitted leftovers in `hw07/`: a one-character style edit to
+  `istack_is_empty` (`s->count == 0` parenthesized) and an untracked
+  `copy_istack.c` scratch rewrite of the ADT. Neither is part of the graded
+  submission — keep or discard, but don't commit the scratch copy blindly.
+- `iom361_r4/` is committed at top level (user decision 2026-11-21,
+  exception to the "no new top-level folders" rule): the extracted
+  hardware-model source — `iom361_r4.c/.h`, Makefile, README, demo, test.
+  The tarball's macOS `._iom361_r4.h` metadata file is deliberately left
+  untracked; the `.tar.gz` itself is gitignored.
+- Term project is **Project 15 "Turnstile"** (spec:
+  `project/ece361_project_15_Xu_Xinyi.pdf`), freeze **Sun Dec 6, 11:59pm**.
+  Assigned variant: key K3, structure S2 (FIFO queue of pending paid
+  passages, capacity 5), report Q4 (temperature rate-of-change anomalies,
+  threshold 3.0 °C). Committed so far: `sensor.h`, `fsm.h`, `store.h`, and
+  a sorted-array `store.c` placeholder (swap the inside for a tree after
+  week 8 without touching the interface).
+- Project spec requires `project/` to contain `iom361_r4.h`/`.c`
+  **unchanged**, plus Makefile (`make` builds `turnstile`, `make test`,
+  `make clean`), `tests/`, `scenarios/`, `SPEC.md`, `AI_USAGE.md`,
+  `ASSIGNMENT.md`. Status word must use hw01 `get_field`/`set_field`; time
+  is `time_t` UTC via `gmtime`/`strftime`.

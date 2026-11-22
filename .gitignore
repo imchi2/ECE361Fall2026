@@ -2,6 +2,7 @@
 *.o
 *.d
 *.pdf
+*.tar.gz
 test_bits
 test_ptr
 test_tally
