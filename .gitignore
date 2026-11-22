@@ -15,5 +15,8 @@ replay
 test_hw06
 balance
 test_istack
+treestats
+test_bst
+test_remove
 tmp_scenario_*.txt
 regress_out.tmp

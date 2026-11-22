@@ -16,7 +16,8 @@ paths and file names** — never rename, move, or add top-level folders.
   committed instead), scratch files (`tmp_scenario_*.txt`, `regress_out.tmp`),
   and one bare name per homework binary (`test_bits`, `test_ptr`,
   `test_tally`, `events`, `readings`, `lock`, `test_lock`, `test_check`,
-  `replay`, `test_hw06`, `balance`, `test_istack`) — no slashes, so each
+  `replay`, `test_hw06`, `balance`, `test_istack`, `treestats`, `test_bst`,
+  `test_remove`) — no slashes, so each
   matches in any `hwNN/` folder. Spec PDFs and build output are intentionally
   never committed. Don't fight it. It used to be UTF-16 (git parsed no
   pattern at all, so the spec PDF showed as untracked); it is plain UTF-8
@@ -145,11 +146,19 @@ These are explicit user requirements, not defaults:
 
 ## Status (as of 2026-11-21)
 
-- hw01–hw07 are all committed (21 commits, latest 2026-11-16). hw07 (istack
+- hw01–hw08 are all committed (24 commits, latest 2026-11-21). hw07 (istack
   ADT + bracket checker) was due Sun Nov 15; its Shine closed Wed Nov 18.
+  hw08 (TutorialsPoint BST ported to a `bst_t` ADT, `treestats`, bonus
+  `bst_remove`) was due Sun Nov 22, its Shine due Wed Nov 25.
   Homework topics: hw01 bits library, hw02 module split, hw03 pointer
   library, hw04 tally ADT + events, hw05 state machines, hw06
-  sensor/panel/scenario replay, hw07 istack.
+  sensor/panel/scenario replay, hw07 istack, hw08 bst ADT.
+- hw08 decisions worth remembering: the crash is the empty-tree search
+  (the faithful port dereferences NULL in the loop condition; the fix is
+  `current != NULL &&` short-circuiting first, report quoted in
+  `hw08/README.md`); `treestats` on `seq 1 1023` gives height 1023,
+  shuffled gives ~23; `make bonus` runs `tests/test_remove.c` under
+  `-fsanitize=address,undefined`.
 - Uncommitted leftovers in `hw07/`: a one-character style edit to
   `istack_is_empty` (`s->count == 0` parenthesized) and an untracked
   `copy_istack.c` scratch rewrite of the ADT. Neither is part of the graded
